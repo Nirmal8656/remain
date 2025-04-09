@@ -12,6 +12,7 @@ class ToDo extends StatefulWidget {
 }
 
 class _ToDoState extends State<ToDo> {
+  final _formKey = GlobalKey<FormState>();
   TextEditingController taskName = TextEditingController();
   DateTime selectedDate = DateTime.now().add(const Duration(days: 3));
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -146,93 +147,104 @@ class _ToDoState extends State<ToDo> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Title Task',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            TextField(
-              controller: taskName,
-              decoration: InputDecoration(
-                hintText: 'Add Task Name..',
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Title Task',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: taskName,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Task name is required';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Add Task Name..',
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            const Text('Category',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            _buildCategorySelector(),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: _pickDate,
-                    child: _buildDateTimeField(
-                        Icons.calendar_today,
-                        DateFormat('dd/MM/yy').format(selectedDate)),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: _pickTime,
-                    child: _buildDateTimeField(
-                        Icons.access_time, selectedTime.format(context)),
-                  ),
-                ),
-              ],
-            ),
-            const Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Colors.blue),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    child:
-                    const Text('Cancel', style: TextStyle(color: Colors.blue)),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      final task = Task(
-                        title: taskName.text,
-                        date: selectedDate,
-                        time: selectedTime,
-                        category: selectedCategory,
-                      );
-                      Navigator.pop(context, task);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    child: Text(
-                      isEditing ? 'Update' : 'Create',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+              const SizedBox(height: 20),
+              const Text('Category',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              _buildCategorySelector(),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _pickDate,
+                      child: _buildDateTimeField(
+                          Icons.calendar_today,
+                          DateFormat('dd/MM/yy').format(selectedDate)),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _pickTime,
+                      child: _buildDateTimeField(
+                          Icons.access_time, selectedTime.format(context)),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: const BorderSide(color: Colors.blue),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child:
+                      const Text('Cancel', style: TextStyle(color: Colors.blue)),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          final task = Task(
+                            title: taskName.text.trim(),
+                            date: selectedDate,
+                            time: selectedTime,
+                            category: selectedCategory,
+                          );
+                          Navigator.pop(context, task);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: Text(
+                        isEditing ? 'Update' : 'Create',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

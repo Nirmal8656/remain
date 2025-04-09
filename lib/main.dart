@@ -65,6 +65,8 @@ class _HomePageState extends State<HomePage> {
     switch (category.toLowerCase()) {
       case 'personal':
         return Colors.blue;
+      case 'team':
+        return Colors.green;
       default:
         return Colors.blueGrey;
     }
@@ -74,10 +76,19 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     String formattedDate = DateFormat('dd MMM yyyy').format(selectedDate);
 
-    final filteredTasks = tasks.where((task) =>
+    final filteredTasks = tasks
+        .where((task) =>
     task.date.year == selectedDate.year &&
         task.date.month == selectedDate.month &&
-        task.date.day == selectedDate.day).toList();
+        task.date.day == selectedDate.day)
+        .toList();
+
+    // Sort tasks by time
+    filteredTasks.sort((a, b) {
+      final aMinutes = a.time.hour * 60 + a.time.minute;
+      final bMinutes = b.time.hour * 60 + b.time.minute;
+      return aMinutes.compareTo(bMinutes);
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -216,7 +227,6 @@ class _HomePageState extends State<HomePage> {
                                   }
                                 },
                               ),
-
                               IconButton(
                                 icon: const Icon(Icons.delete, size: 20),
                                 onPressed: () {
@@ -228,7 +238,7 @@ class _HomePageState extends State<HomePage> {
                                         content: const Text("Are you sure you want to delete this task?"),
                                         actions: [
                                           TextButton(
-                                            onPressed: () => Navigator.of(context).pop(), // Cancel
+                                            onPressed: () => Navigator.of(context).pop(),
                                             child: const Text("Cancel"),
                                           ),
                                           TextButton(
@@ -236,12 +246,9 @@ class _HomePageState extends State<HomePage> {
                                               setState(() {
                                                 tasks.remove(task);
                                               });
-                                              Navigator.of(context).pop(); // Close dialog
+                                              Navigator.of(context).pop();
                                             },
-                                            child: const Text(
-                                              "Delete",
-                                              style: TextStyle(color: Colors.red),
-                                            ),
+                                            child: const Text("Delete", style: TextStyle(color: Colors.red)),
                                           ),
                                         ],
                                       );
@@ -249,7 +256,6 @@ class _HomePageState extends State<HomePage> {
                                   );
                                 },
                               ),
-
                             ],
                           ),
                           const SizedBox(height: 8),
