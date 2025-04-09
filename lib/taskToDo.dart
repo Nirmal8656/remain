@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'main.dart'; // Make sure Task class is defined in main.dart
 
 class ToDo extends StatefulWidget {
-  const ToDo({super.key});
+  final Task? task;
+
+  const ToDo({super.key, this.task});
 
   @override
   State<ToDo> createState() => _ToDoState();
@@ -14,6 +16,17 @@ class _ToDoState extends State<ToDo> {
   DateTime selectedDate = DateTime.now().add(const Duration(days: 3));
   TimeOfDay selectedTime = TimeOfDay.now();
   String selectedCategory = 'Personal';
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.task != null) {
+      taskName.text = widget.task!.title;
+      selectedDate = widget.task!.date;
+      selectedTime = widget.task!.time;
+      selectedCategory = widget.task!.category;
+    }
+  }
 
   void _pickDate() async {
     final DateTime? date = await showDatePicker(
@@ -46,14 +59,18 @@ class _ToDoState extends State<ToDo> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: selectedCategory == 'Personal' ? Colors.blue.shade200 : Colors.grey.shade200,
+                color: selectedCategory == 'Personal'
+                    ? Colors.blue.shade200
+                    : Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
                 children: const [
                   Icon(Icons.person, color: Colors.black54),
                   SizedBox(height: 4),
-                  Text('Personal', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+                  Text('Personal',
+                      style:
+                      TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -66,14 +83,18 @@ class _ToDoState extends State<ToDo> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: selectedCategory == 'Team' ? Colors.blue.shade200 : Colors.grey.shade200,
+                color: selectedCategory == 'Team'
+                    ? Colors.blue.shade200
+                    : Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
                 children: const [
                   Icon(Icons.group, color: Colors.black54),
                   SizedBox(height: 4),
-                  Text('Teams', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+                  Text('Teams',
+                      style:
+                      TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -102,15 +123,17 @@ class _ToDoState extends State<ToDo> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.task != null;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-        title: const Text(
-          'Add New Task',
-          style: TextStyle(
+        title: Text(
+          isEditing ? 'Edit Task' : 'Add New Task',
+          style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -126,7 +149,8 @@ class _ToDoState extends State<ToDo> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Title Task', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Title Task',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextField(
               controller: taskName,
@@ -134,29 +158,33 @@ class _ToDoState extends State<ToDo> {
                 hintText: 'Add Task Name..',
                 filled: true,
                 fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
               ),
             ),
             const SizedBox(height: 20),
-            const Text('Category', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Category',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             _buildCategorySelector(),
-            const SizedBox(height: 20),
-            const SizedBox(height: 8),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: GestureDetector(
                     onTap: _pickDate,
-                    child: _buildDateTimeField(Icons.calendar_today, DateFormat('dd/MM/yy').format(selectedDate)),
+                    child: _buildDateTimeField(
+                        Icons.calendar_today,
+                        DateFormat('dd/MM/yy').format(selectedDate)),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: GestureDetector(
                     onTap: _pickTime,
-                    child: _buildDateTimeField(Icons.access_time, selectedTime.format(context)),
+                    child: _buildDateTimeField(
+                        Icons.access_time, selectedTime.format(context)),
                   ),
                 ),
               ],
@@ -170,9 +198,11 @@ class _ToDoState extends State<ToDo> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: const BorderSide(color: Colors.blue),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: const Text('Cancel', style: TextStyle(color: Colors.blue)),
+                    child:
+                    const Text('Cancel', style: TextStyle(color: Colors.blue)),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -191,9 +221,13 @@ class _ToDoState extends State<ToDo> {
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: const Text('Create', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(
+                      isEditing ? 'Update' : 'Create',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],

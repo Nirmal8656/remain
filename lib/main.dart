@@ -171,44 +171,97 @@ class _HomePageState extends State<HomePage> {
                       decoration: BoxDecoration(
                         color: categoryColor.withAlpha(100),
                         borderRadius: BorderRadius.circular(20),
-
                       ),
-                      child:
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: Colors.white,
-                                      radius: 14,
-                                      child: Text(
-                                        task.title[0].toUpperCase(),
-                                        style: TextStyle(
-                                            color: categoryColor,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(task.title,
-                                          textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600)),
-                                    ),
-                                  ],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 14,
+                                child: Text(
+                                  task.title[0].toUpperCase(),
+                                  style: TextStyle(
+                                    color: categoryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  task.title,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 20),
+                                onPressed: () async {
+                                  final editedTask = await Navigator.push<Task>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ToDo(task: task),
+                                    ),
+                                  );
 
-                                const SizedBox(height: 8),
-                                Text(timeText,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold, fontSize: 16)),
+                                  if (editedTask != null) {
+                                    setState(() {
+                                      final index = tasks.indexOf(task);
+                                      tasks[index] = editedTask;
+                                    });
+                                  }
+                                },
+                              ),
 
-                              ],
+                              IconButton(
+                                icon: const Icon(Icons.delete, size: 20),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text("Delete Task"),
+                                        content: const Text("Are you sure you want to delete this task?"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(), // Cancel
+                                            child: const Text("Cancel"),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                tasks.remove(task);
+                                              });
+                                              Navigator.of(context).pop(); // Close dialog
+                                            },
+                                            child: const Text(
+                                              "Delete",
+                                              style: TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            timeText,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                           ),
+                        ],
+                      ),
                     ),
                     if (index != filteredTasks.length - 1)
                       const SizedBox(height: 16),
